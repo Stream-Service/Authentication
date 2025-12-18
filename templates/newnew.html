@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Gallery with Popup</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+
+     
+    body { font-family: Arial, sans-serif; }
+    h1 { margin-bottom: 20px; }
+
+    .video-card {
+  width: 380px;                     /* bigger card */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  margin: 15px;
+}
+
+.video-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+/* Header bar with title + dots */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: bold;
+  background: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 35px;
+  right: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 5px 0;
+}
+
+.dropdown-menu li {
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dropdown-menu li:hover {
+  background: #f0f0f0;
+}
+.menu-dots {
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+.menu-dots:hover { color: #000; }
+
+/* Thumbnail section */
+.thumbnail {
+  width: calc(100% - 20px);
+  height: 180px;
+  margin: 10px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+}
+
+/* Description section */
+.description_section {
+  padding: 15px;
+  border-top: 1px solid #eee;   /* divider line */
+  font-size: 12px;
+  color: #444;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.username {
+  font-weight: bold;
+  font-size: 14px;
+  color: #222;
+}
+.description_section .video-title {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.description_section p {
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.description_section span {
+  font-size: 12px;
+  color: gray;
+}
+
+.profile-pic {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;   /* makes it a circle */
+  object-fit: cover;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+}
+   
+    /* Video list */
+    #videoList { display: flex; flex-wrap: wrap; gap: 20px; }
+    
+    /* .video-card img { width: 100%; border-radius: 6px; } */
+
+    /* Modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff;
+      width: 80%; height: 70%;
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .video-section {
+      flex: 2; background: #000;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+    }
+    .video-section video { width: 100%; height: 80%; object-fit: cover; }
+    .video-actions { margin-top: 10px; display: flex; gap: 15px; }
+    .comments-section {
+      flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9;
+    }
+    .comment {
+      padding: 8px; margin-bottom: 10px;
+      background: #fff; border-radius: 5px; border: 1px solid #ddd;
+    }
+    .close-btn {
+      position: absolute; top: 15px; right: 20px;
+      font-size: 24px; cursor: pointer; color: #fff;
+    }
+    .action-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border: none; border-radius: 6px;
+      font-size: 16px; cursor: pointer;
+      background: #f0f0f0; color: #333;
+      transition: all 0.2s ease;
+    }
+    .action-btn:hover { background: #e0e0e0; transform: scale(1.05); }
+    #likeBtn { background: #e6f7e6; color: #2e7d32; }
+    #dislikeBtn { background: #fdecea; color: #c62828; }
+  </style>
+</head>
+<body>
+   
+  <div id="videoList"></div>
+
+  <!-- Modal -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <div class="video-section">
+        <video id="videoPlayer" controls></video>
+        <div class="video-actions">
+          <button id="Subscribe" class="action-btn">
+            👍 <span>Subscibe</span> <span id="likeCount">0</span>
+          </button>
+          <button id="likeBtn" class="action-btn">
+            👍 <span>Like</span> <span id="likeCount">0</span>
+          </button>
+          <button id="dislikeBtn" class="action-btn">
+            👎 <span>Dislike</span> <span id="dislikeCount">0</span>
+          </button>
+        </div>
+      </div>
+      <div class="comments-section">
+        <h3>Comments</h3>
+        <div id="addCommentBox" style="margin-bottom:15px;">
+          <textarea id="newComment" placeholder="Write a comment..." rows="3" style="width:100%; padding:8px;"></textarea>
+          <button id="submitComment" class="action-btn" style="margin-top:8px;">💬 Add Comment</button>
+        </div>
+        <div id="commentsContainer"></div>
+      </div>
+      <span class="close-btn" id="closePopup">&times;</span>
+    </div>
+  </div>
+
+<script>
+const modal = document.getElementById("videoModal");
+const closeBtn = document.getElementById("closePopup");
+const videoPlayer = document.getElementById("videoPlayer");
+const commentsContainer = document.getElementById("commentsContainer");
+const likeBtn = document.getElementById("likeBtn");
+const dislikeBtn = document.getElementById("dislikeBtn");
+const subsbutton= document.getElementById("Subscribe");
+const likeCountEl = document.getElementById("likeCount");
+const dislikeCountEl = document.getElementById("dislikeCount");
+const submitCommentBtn = document.getElementById("submitComment");
+const newCommentInput = document.getElementById("newComment");
+
+const USER_ID = 5;
+let CURRENT_VIDEO_ID = null;
+
+// Fetch all videos from API and render list
+async function loadVideoList(user_id) {
+  try {
+    const response = await fetch(`http://127.0.0.1:8010/api/videos?user_id=${user_id}&page=0&limit=10`);
+    if (!response.ok) throw new Error("Failed to fetch videos");
+    const videos = await response.json();
+
+    const videoList = document.getElementById("videoList");
+    videoList.innerHTML = "";
+
+    videos.forEach(v => {
+
+        const div_card= document.createElement("div");
+        div_card.className = "video-card";
+
+// Header with title + menu dots
+        const header = document.createElement("div");
+        header.className = "card-header";
+        header.innerHTML = `
+         
+        <span class="menu-dots">⋮</span>`;
+
+        const menu = document.createElement("div");
+        menu.className = "dropdown-menu";
+        menu.innerHTML = `
+        <ul>
+            <li>Edit</li>
+            <li>Delete</li>
+            <li>Share</li>
+        </ul>
+        `;
+        menu.style.display = "none"; // hidden by default
+        header.appendChild(menu);
+
+        header.querySelector(".menu-dots").onclick = (e) => {e.stopPropagation(); // prevent card click
+  menu.style.display = menu.style.display === "none" ? "block" : "none";
+};
+
+// Thumbnail
+        const img = document.createElement("img");
+        img.src = v.thumbnail_url;
+        img.alt = v.title;
+        img.className = "thumbnail";
+
+// Description section
+        const description_div = document.createElement("div");
+        description_div.className = "description_section";
+        
+         
+        
+      const span_div1 = document.createElement("span");
+      span_div1.innertext= v.title
+      const span_div = document.createElement("span");
+      span_div.innertext= v.views
+      const user_div = document.createElement("div");
+      user_div.className = "user-info";
+      user_div.innerHTML = `
+  <img src="http://127.0.0.1:8010/profile-pic/${v.user_id}" 
+       alt="err" 
+       class="profile-picc"
+       onclick="openPopup('/pop/${v.user_id}')">
+  <span class="username">Hritik</span>
+`;
+
+// Build card
+        div_card.appendChild(header);
+        div_card.appendChild(img);
+        description_div.appendChild(span_div1)
+        description_div.appendChild(span_div)
+        
+        description_div.appendChild(user_div) 
+        div_card.appendChild(description_div);
+
+        img.onclick = () => openVideo(v.video_id, v.manifest_url);
+        videoList.appendChild(div_card);
+
+       
+    });
+  } catch (err) {
+    console.error("❌ Error loading video list:", err);
+  }
+}
+
+// Open modal for a specific video
+ 
+async function openVideo(videoId, videoUrl) {
+  CURRENT_VIDEO_ID = videoId;
+  modal.style.display = 'flex';
+  videoPlayer.pause();
+  videoPlayer.src = '';
+
+  if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(videoUrl);
+    hls.attachMedia(videoPlayer);
+  } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+    videoPlayer.src = videoUrl; // Safari fallback
+  }
+
+  videoPlayer.play(); // may require muted
+  await loadComments(CURRENT_VIDEO_ID);
+}
+// Close modal
+closeBtn.onclick = () => { modal.style.display = "none"; };
+window.onclick = (event) => { if (event.target === modal) modal.style.display = "none"; };
+
+// Load comments
+async function loadComments(video_id) {
+  commentsContainer.innerHTML = "Loading comments...";
+  try {
+    const response = await fetch(`http://127.0.0.1:8010/videos/comments/${video_id}`);
+    if (!response.ok) throw new Error("Failed to fetch comments");
+    const comments = await response.json();
+
+    commentsContainer.innerHTML = "";
+    comments.forEach(c => {
+      const date = new Date(c.created_at).toLocaleString();
+      const div = document.createElement("div");
+      div.className = "comment";
+      div.innerHTML = `
+        <strong>${c.user.username}</strong> 
+        <span style="color:gray;font-size:12px;">(${date})</span>
+        <p>${c.content}</p>
+      `;
+      commentsContainer.appendChild(div);
+    });
+  } catch (err) {
+    commentsContainer.innerHTML = `❌ Error loading comments: ${err}`;
+  }
+}
+
+// Load stats
+ 
+
+// Like/Dislike
+async function handleLike(user_id,video_id) {
+  try {
+    const response = await fetch(`http://127.0.0.1:8010/videos/like/${video_id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: user_id})
+    });
+    if (!response.ok) throw new Error("Failed to like video");
+    const result = await response.json();
+    likeCountEl.innerText = result.likes;
+  } catch (err) {
+    alert(`❌ Error: ${err}`);
+  }
+}
+
+async function handleDislike(user_id,video_id) {
+  try {
+    const response = await fetch(`http://127.0.0.1:8010/videos/dislike/${video_id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: user_id})
+    });
+    if (!response.ok) throw new Error("Failed to dislike video");
+    const result = await response.json();
+    dislikeCountEl.innerText = result.dislikes;
+  } catch (err) {
+    alert(`❌ Error: ${err}`);
+  }
+}
+
+
+
+ // Add comment
+async function addComment(user_id,video_id) {
+  const content = newCommentInput.value.trim();
+  if (!content) {
+    alert("Please enter a comment");
+    return;
+  }
+  try {
+    const response = await fetch(`http://127.0.0.1:8010/videos/comment/${video_id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: user_id,
+        video_id: video_id,
+        content: content
+      })
+    });
+
+    if (!response.ok) throw new Error("Failed to add comment");
+
+    // Clear input
+    newCommentInput.value = "";
+
+    // Reload comments to show the new one
+    await loadComments(CURRENT_VIDEO_ID);
+  } catch (err) {
+    alert(`❌ Error adding comment: ${err}`);
+  }
+}
+
+
+async function Subscribe(follower_id,following_id) {
+   
+  try {
+    const response = await fetch(`http://127.0.0.1:8003/follow`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        follower_id:follower_id,
+        following_id:following_id,
+         
+      })
+    });
+
+    if (!response.ok) throw new Error("Failed to follow");
+
+    // Clear input
+    newCommentInput.value = "";
+
+    // Reload comments to show the new one
+    await loadComments(CURRENT_VIDEO_ID);
+  } catch (err) {
+    alert(`❌ Error adding comment: ${err}`);
+  }
+}
+
+/// Bind events (make sure they are functions, not immediate calls)
+likeBtn.onclick = () => handleLike(USER_ID,CURRENT_VIDEO_ID);
+dislikeBtn.onclick = () => handleDislike(USER_ID,CURRENT_VIDEO_ID);
+submitCommentBtn.onclick = () => addComment(USER_ID, CURRENT_VIDEO_ID);
+subsbutton.onclick = () => Subscribe(USER_ID, USER_ID);
+
+// Load video list automatically on page load
+document.addEventListener("DOMContentLoaded", () => {
+  loadVideoList(USER_ID);
+});
+
+</script>
+</body>
+</html>

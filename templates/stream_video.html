@@ -1,0 +1,68 @@
+{% extends "profile.html" %}
+
+{% block title %}Video Gallery{% endblock %}
+
+
+{% block headers %} <!-- Left section replaced with upload form -->
+ 
+{% endblock headers %}
+
+{% block temp%}
+  <h1>Video Gallery</h1>
+  <div id="gallery" class="gallery-grid"></div>
+  <div id="videoList"></div>
+  <!-- Player Modal -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <div class="video-section">
+        <video id="videoPlayer" controls></video>
+        <div class="video-actions">
+          <button id="Subscribe" class="action-btn">
+            👍 <span>Subscibe</span> <span id="likeCount">0</span>
+          </button>
+          <button id="likeBtn" class="action-btn">
+            👍 <span>Like</span> <span id="likeCount">0</span>
+          </button>
+          <button id="dislikeBtn" class="action-btn">
+            👎 <span>Dislike</span> <span id="dislikeCount">0</span>
+          </button>
+        </div>
+      </div>
+      <div class="comments-section">
+        <h3>Comments</h3>
+        <div id="addCommentBox" style="margin-bottom:15px;">
+          <textarea id="newComment" placeholder="Write a comment..." rows="3" style="width:100%; padding:8px;"></textarea>
+          <button id="submitComment" class="action-btn" style="margin-top:8px;">💬 Add Comment</button>
+        </div>
+        <div id="commentsContainer"></div>
+      </div>
+      <span class="close-btn" id="closePopup">&times;</span>
+    </div>
+  </div>
+  
+  
+
+  
+
+  
+
+  
+{% endblock %}
+ 
+
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/stream.css') }}">
+
+
+{% endblock %}
+{% block script %}
+<script src="{{ url_for('static', path='js/new_stream.js') }}"></script>
+{% endblock script %}
+
+
+
+ 
+
+
+

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | SocialApp</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #e9f5ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      width: 400px;
+      text-align: center;
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #007bff;
+    }
+
+    .login-box input,
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .login-box input {
+      border: 1px solid #ccc;
+    }
+
+    .login-box button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .login-box button:hover {
+      background-color: #007bff;
+    }
+
+    .login-box p {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .login-box a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+   
+<link rel="stylesheet" href="{{ url_for('static', path='css/profile.css') }}">
+
+ 
+
+</head>
+<body>
+  <div class="login-box">
+  <h2>Welcome Back</h2>
+  <input type="email" id="username" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button id="loginBtn">Login</button>
+  <p>New here? <a href="/register">Create an account</a></p>
+  <div id="status"></div>
+</div>
+
+<script src="{{ url_for('static', path='js/index.js') }}"></script>
+</body>
+</html>
