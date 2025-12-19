@@ -1,9 +1,9 @@
 name: test
 
 on:
-    schedule:
-        - cron: '* * * * *'  
-     
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
 
 jobs:
 
