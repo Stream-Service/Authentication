@@ -31,7 +31,7 @@ def login(data:OAuth2PasswordRequestForm=Depends(),db:Session=Depends(get_db)):
     db.add(token_)
     db.commit()
     response = JSONResponse(
-        content={"access_token": access_token, "refresh_token": refresh_token}
+        content={"access_token": access_token, "refresh_token": refresh_token,"user_id":user_id}
     )
     response.set_cookie(
     key="access_token",
