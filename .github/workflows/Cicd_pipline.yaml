@@ -38,7 +38,7 @@ jobs:
         with:
           repository: Hritik-choukikar/secret
           ref: main
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
           path: infra-repo
 
       - name: Set up kubectl
