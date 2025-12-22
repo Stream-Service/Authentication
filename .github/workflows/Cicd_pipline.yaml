@@ -2,6 +2,8 @@ name: auth_pipeline
 on:
   push:
     branches: ["main"]
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -38,6 +40,7 @@ jobs:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
           path: infra-repo
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
