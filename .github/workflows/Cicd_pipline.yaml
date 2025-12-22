@@ -36,7 +36,7 @@ jobs:
         with:
           repository: Hritik-choukikar/secret
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: infra
+          path: infra-repo
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
