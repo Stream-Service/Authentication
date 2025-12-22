@@ -48,5 +48,5 @@ jobs:
       - name: Apply Kubernetes manifests
         run: |
           kubectl set image deployment/auth-deployment auth=hritik2345/auth:${{ github.sha }} -n default 
-          kubectl apply -f infra/ 
+          kubectl apply -f infra-repo/
           kubectl rollout status deployment/auth-deployment -n default
