@@ -64,7 +64,7 @@ jobs:
       # 9. Apply Kubernetes manifests
       - name: Apply Kubernetes manifests
         run: |
-          sed -i "s|IMAGE_PLACEHOLDER|hritik2345/auth:${{ github.sha }}|g" infra-repo/k8s/deployment.yaml
-          kubectl apply -f infra-repo/k8s/deployment.yaml
-          kubectl apply -f infra-repo/k8s/services.yaml
+          sed -i "s|IMAGE_PLACEHOLDER|hritik2345/auth:${{ github.sha }}|g" infra-repo/infra-repo/k8s/deployment.yaml 
+          kubectl apply -f infra-repo/infra-repo/k8s/deployment.yaml 
+          kubectl apply -f infra-repo/infra-repo/k8s/services.yaml 
           kubectl rollout status deployment/auth-deployment -n default
