@@ -55,7 +55,7 @@ jobs:
       # 8. Configure kubeconfig
       - name: Configure kubeconfig
         run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          echo "${{ secrets.KUBECONFIG2 }}" > kubeconfig.yaml
           export KUBECONFIG=kubeconfig.yaml
 
       - name: List infra repo files
