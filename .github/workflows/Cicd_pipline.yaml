@@ -1,39 +1,40 @@
 name: auth_pipeline
+
 on:
   push:
     branches: ["main"]
+
 permissions:
   contents: read
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: chekkkk
-        run: echo djbkd
-
-      - name: check out user
+      # 1. Checkout source code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: setup docker
+      # 2. Set up Docker
+      - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      # 3. Log in to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: chekkkk
-        run: echo djbkd
-
+      # 4. Build and push Docker image
       - name: Build and push Docker image
         run: |
-          docker build -t hritik2345/auth:${{ github.sha }} . 
+          docker build -t hritik2345/auth:${{ github.sha }} .
           docker push hritik2345/auth:${{ github.sha }}
 
-      - name: Checkout secret repo (infra configs)
+      # 5. Checkout infra repo (manifests)
+      - name: Checkout infra repo
         uses: actions/checkout@v3
         with:
           repository: Hritik-choukikar/secret
@@ -41,18 +42,26 @@ jobs:
           token: ${{ secrets.GH_PAT3 }}
           path: infra-repo
 
+      # 6. Debug manifest paths
+      - name: List infra repo files
+        run: ls -R infra-repo
+
+      # 7. Set up kubectl
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: "latest"
-      - name: Configure kubeconfigd    
+
+      # 8. Configure kubeconfig
+      - name: Configure kubeconfig
         run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml 
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
           export KUBECONFIG=kubeconfig.yaml
+
+      # 9. Apply Kubernetes manifests
       - name: Apply Kubernetes manifests
-        run: | 
-          # Replace image tag dynamically in deployment.yaml beforffe applying 
-          sed -i "s|IMAGE_PLACEHOLDER|hritik2345/auth:${{ github.sha }}|g" infra-repo/deployment.yaml 
-          kubectl apply -f infra-repo/deployment.yaml 
-          kubectl apply -f infra-repo/services.yaml
+        run: |
+          sed -i "s|IMAGE_PLACEHOLDER|hritik2345/auth:${{ github.sha }}|g" infra-repo/k8s/deployment.yaml
+          kubectl apply -f infra-repo/k8s/deployment.yaml
+          kubectl apply -f infra-repo/k8s/service.yaml
           kubectl rollout status deployment/auth-deployment -n default
