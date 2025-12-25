@@ -51,7 +51,7 @@ jobs:
           export KUBECONFIG=kubeconfig.yaml
       - name: Apply Kubernetes manifests
         run: | 
-          # Replace image tag dynamically in deployment.yaml before applying 
+          # Replace image tag dynamically in deployment.yaml beforffe applying 
           sed -i "s|IMAGE_PLACEHOLDER|hritik2345/auth:${{ github.sha }}|g" infra-repo/deployment.yaml 
           kubectl apply -f infra-repo/deployment.yaml 
           kubectl apply -f infra-repo/services.yaml
