@@ -50,7 +50,9 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml 
           export KUBECONFIG=kubeconfig.yaml
       - name: Apply Kubernetes manifests
-        run: |
-          kubectl set image deployment/auth-deployment auth=hritik2345/auth:${{ github.sha }} -n default 
-          kubectl apply -f infra-repo/
+        run: | 
+          # Replace image tag dynamically in deployment.yaml before applying 
+          sed -i "s|IMAGE_PLACEHOLDER|hritik2345/auth:${{ github.sha }}|g" infra-repo/deployment.yaml 
+          kubectl apply -f infra-repo/deployment.yaml 
+          kubectl apply -f infra-repo/services.yaml
           kubectl rollout status deployment/auth-deployment -n default
