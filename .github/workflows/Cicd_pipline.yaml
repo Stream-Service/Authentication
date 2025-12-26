@@ -47,7 +47,7 @@ jobs:
         run: ls -R infra-repo
 
       # 7. Set up kubectl
-      - name: Set up kubectl
+      - name: Set up kubectlgiddddd
         uses: azure/setup-kubectl@v3
         with:
           version: "latest"
