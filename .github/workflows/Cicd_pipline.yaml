@@ -47,26 +47,26 @@ jobs:
         run: ls -R infra-repo
 
       # 7. Set up kubectl
-      - name: Set up kubectlgiddddd
+      - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: "latest"
 
-      # 8. Configure kubeconfig
+      # 8. Configure kubeconfig (single source of truth)
       - name: Configure kubeconfig
         run: |
-          echo "${{ secrets.KUBECONFIG5 }}" > kubeconfig.yaml
-          export KUBECONFIG=kubeconfig.yaml
-      - name: Check kubeconfig file exists
-        run: |
-          ls -l kubeconfig.yaml 
-          head -n 20 kubeconfig.yaml
-      - name: List infra repo files
-        run: ls -R infra-repo
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG5 }}" > $HOME/.kube/config
 
-      # 9. Apply Kubernetes manifests
-      - name: Apply Kubernetes manifestss
+      # 9. Verify kubeconfig
+      - name: Verify cluster connection
+        run: |
+          kubectl config current-context
+          kubectl get nodes
+
+      # 10. Apply Kubernetes manifests
+      - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f infra-repo/infra-repo/k8s/deployment.yaml --validate=false
-          kubectl apply -f infra-repo/infra-repo/k8s/services.yaml 
+          kubectl apply -f infra-repo/infra-repo/k8s/services.yaml
           kubectl rollout status deployment/auth-deployment -n default
