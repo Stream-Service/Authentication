@@ -1,4 +1,4 @@
-name: auth_pipeline
+name: auth-pipeline
 
 on:
   push:
