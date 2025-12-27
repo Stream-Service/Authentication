@@ -55,8 +55,9 @@ jobs:
       # 8. Configure kubeconfig (single source of truth)
       - name: Configure kubeconfig
         run: |
-          mkdir -p $HOME/.kube 
+          mkdir -p $HOME/.kube
           echo "${{ secrets.DOP }}" | base64 -d > $HOME/.kube/config
+          # If DOP contains raw YAML, remove '| base64 -d'
 
       # 9. Verify kubeconfig
       - name: Verify cluster connection
@@ -67,6 +68,6 @@ jobs:
       # 10. Apply Kubernetes manifests
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f infra-repo/infra-repo/k8s/deployment.yaml --validate=false
-          kubectl apply -f infra-repo/infra-repo/k8s/services.yaml
+          kubectl apply -f infra-repo/k8s/deployment.yaml --validate=false
+          kubectl apply -f infra-repo/k8s/services.yaml
           kubectl rollout status deployment/auth-deployment -n default
