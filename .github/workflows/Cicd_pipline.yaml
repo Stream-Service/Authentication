@@ -59,7 +59,13 @@ jobs:
           echo "${{ secrets.DOP }}" | base64 -d > $HOME/.kube/config
           # If DOP contains raw YAML, remove '| base64 -d'
 
-      # 9. Verify kubeconfig
+      - name: Debug kubeconfig
+        run: |
+          echo "---- kubeconfig path ----" 
+          ls -l $HOME/.kube/config 
+          echo "---- first 20 lines ----" 
+          head -n 20 $HOME/.kube/config
+      #9. Verify kubeconfig
       - name: Verify cluster connection
         run: |
           kubectl config current-context
