@@ -62,7 +62,7 @@ jobs:
       - name: Verify cluster connection
         run: |
           kubectl config current-context
-          kubectl get nodes
+          kubectl get namespaces
 
       # 10. Apply Kubernetes manifests
       - name: Apply Kubernetes manifests
