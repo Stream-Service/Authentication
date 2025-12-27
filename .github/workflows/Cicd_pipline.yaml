@@ -53,10 +53,10 @@ jobs:
           version: "latest"
 
       # 8. Configure kubeconfig (single source of truth)
-      - name: Configure kubeconfieg
+      - name: Configure kubeconfig
         run: |
           mkdir -p $HOME/.kube 
-          echo "${{ secrets.KUBECONFIG6 }}" | $HOME/.kube/config
+          echo "${{ secrets.KUBECONFIG5 }}" > $HOME/.kube/config
 
       # 9. Verify kubeconfig
       - name: Verify cluster connection
