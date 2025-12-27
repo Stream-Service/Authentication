@@ -55,8 +55,8 @@ jobs:
       # 8. Configure kubeconfig (single source of truth)
       - name: Configure kubeconfig
         run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG6 }}" > $HOME/.kube/config
+          mkdir -p $HOME/.kube 
+          echo "${{ secrets.KUBECONFIG6 }}" | base64 -d > $HOME/.kube/config
 
       # 9. Verify kubeconfig
       - name: Verify cluster connection
