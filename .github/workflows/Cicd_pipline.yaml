@@ -55,7 +55,7 @@ jobs:
       # 8. Configure kubeconfig
       - name: Configure kubeconfig
         run: |
-          echo "${{ secrets.KUBECONFIG4 }}" > kubeconfig.yaml
+          echo "${{ secrets.KUBECONFIG5 }}" > kubeconfig.yaml
           export KUBECONFIG=kubeconfig.yaml
       - name: Check kubeconfig file exists
         run: |
