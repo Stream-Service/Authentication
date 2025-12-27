@@ -56,7 +56,7 @@ jobs:
       - name: Configure kubeconfig
         run: |
           mkdir -p $HOME/.kube 
-          echo "${{ secrets.KUBECONFIG7 }}" | base64 -d > $HOME/.kube/config
+          echo "${{ secrets.KUBECONFIG6 }}" | $HOME/.kube/config
 
       # 9. Verify kubeconfig
       - name: Verify cluster connection
