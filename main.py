@@ -12,13 +12,13 @@ from core.database import engine,get_db
 from users.schemas import ResponseUser
 from auth.model import Base
 Base.metadata.create_all(bind=engine)
-templates = Jinja2Templates(directory="templates")
+ 
 
 from fastapi.middleware.cors import CORSMiddleware
 
 
 app=FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+ 
 
 app.include_router(user_router)
 app.include_router(auth_router)
@@ -33,12 +33,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.get("/", response_class=HTMLResponse)
-def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
  
+
+@app.get('/')
+def healthcheck():
+    
+    return JSONResponse("Hey whatupp",status_code=200)
     
  
  
