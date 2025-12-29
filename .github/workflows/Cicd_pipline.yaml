@@ -48,6 +48,9 @@ jobs:
           path: infra-repo
 
       # 6. Debug manifest paths
+      - name: Debug infra repo files
+        run: |
+          ls -R infra-repo
 
       # 7. Set up kubectla
       - name: Set up kubectlas
