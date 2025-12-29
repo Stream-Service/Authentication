@@ -82,6 +82,7 @@ jobs:
       - name: Apply Kubernetes manifestsswsws
         shell: powershell
         run: |
+          kubectl delete pod authpod
           kubectl apply -f infra-repo/infra-repo/k8s/ConfigMap.yaml 
           kubectl apply -f infra-repo/infra-repo/k8s/secrets.yaml
           kubectl apply -f infra-repo/infra-repo/k8s/deployment.yaml --validate=false
