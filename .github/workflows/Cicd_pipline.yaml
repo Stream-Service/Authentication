@@ -77,6 +77,6 @@ jobs:
       - name: Apply Kubernetes manifestss
         shell: powershell
         run: |
-          kubectl apply -f infra-repo/k8s/deployment.yaml --validate=false
-          kubectl apply -f infra-repo/k8s/services.yaml
+          kubectl apply -f infra-repo/infra-repo/k8s/deployment.yaml --validate=false
+          kubectl apply -f infra-repo/infra-repo/k8s/services.yaml
           kubectl rollout status deployment/auth-deployment -n default
