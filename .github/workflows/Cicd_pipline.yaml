@@ -79,10 +79,10 @@ jobs:
           (Get-Content infra-repo\infra-repo\k8s\deployment.yaml) -replace 'IMAGE_PLACEHOLDER', 'hritik2345/auth:4f1ea11179c3148ade734947511b1f7f7f9f2c60' | Set-Content infra-repo\infra-repo\k8s\deployment.yaml
 
       # 10. Apply Kubernetes manifests
-      - name: Apply Kubernetes manifestssws
+      - name: Apply Kubernetes manifestsswsw
         shell: powershell
         run: |
 
           kubectl apply -f infra-repo/infra-repo/k8s/deployment.yaml --validate=false
           kubectl apply -f infra-repo/infra-repo/k8s/services.yaml
-          kubectl rollout status deployment/auth-deployment -n default
+          
