@@ -10,8 +10,8 @@ permissions:
 jobs:
   build-deploy:
     runs-on: self-hosted
-    defaults: 
-      run: 
+    defaults:
+      run:
         shell: bash
 
     steps:
@@ -48,11 +48,9 @@ jobs:
           path: infra-repo
 
       # 6. Debug manifest paths
-      - name: List infra repo files
-        run: ls -R infra-repo
 
-      # 7. Set up kubectl
-      - name: Set up kubectl
+      # 7. Set up kubectla
+      - name: Set up kubectla
         uses: azure/setup-kubectl@v3
         with:
           version: "latest"
