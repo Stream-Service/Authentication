@@ -62,12 +62,6 @@ jobs:
           New-Item -ItemType Directory -Force -Path $HOME\.kube
           [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.DOP }}")) | Out-File -FilePath $HOME\.kube\config -Encoding utf8
 
-      - name: Debug kubeconfig
-        run: |
-          echo "---- kubeconfig path ----" 
-          ls -l $HOME/.kube/config 
-          echo "---- first 20 lines ----" 
-          head -n 20 $HOME/.kube/config
       #9. Verify kubeconfig
       - name: Verify cluster connection
         run: |
