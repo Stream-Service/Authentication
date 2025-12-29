@@ -49,6 +49,7 @@ jobs:
 
       # 6. Debug manifest paths
       - name: Debug infra repo files
+        shell: powershell
         run: |
           ls -R infra-repo
 
