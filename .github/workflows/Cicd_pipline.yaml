@@ -16,7 +16,7 @@ jobs:
 
     steps:
       # 1. Checkout source code
-      - name: Checkout codew
+      - name: Checkout codews
         uses: actions/checkout@v3
 
       # 2. Set up Docker
