@@ -30,7 +30,7 @@ jobs:
       # 4. Build and push Docker image
       - name: Build and push Docker image
 
-        shell: pwsh
+        shell: powershell
         run: |
           docker build -t hritik2345/auth:${{ github.sha }} .
           docker push hritik2345/auth:${{ github.sha }}
