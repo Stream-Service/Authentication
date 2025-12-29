@@ -64,6 +64,7 @@ jobs:
 
       #9. Verify kubeconfig
       - name: Verify cluster connection
+        shell: powershell
         run: |
           kubectl config current-context
           kubectl get namespaces
