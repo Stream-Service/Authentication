@@ -71,6 +71,7 @@ jobs:
 
       # 10. Apply Kubernetes manifests
       - name: Apply Kubernetes manifestss
+        shell: powershell
         run: |
           kubectl apply -f infra-repo/k8s/deployment.yaml --validate=false
           kubectl apply -f infra-repo/k8s/services.yaml
