@@ -57,10 +57,10 @@ jobs:
 
       # 8. Configure kubeconfig (single source of truth)
       - name: Configure kubeconfig
+        shell: powershell
         run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.DOP }}" | base64 -d > $HOME/.kube/config
-          # If DOP contains raw YAML, remove '| base64 -d'
+          New-Item -ItemType Directory -Force -Path $HOME\.kube
+          [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.DOP }}")) | Out-File -FilePath $HOME\.kube\config -Encoding utf8
 
       - name: Debug kubeconfig
         run: |
@@ -75,7 +75,7 @@ jobs:
           kubectl get namespaces
 
       # 10. Apply Kubernetes manifests
-      - name: Apply Kubernetes manifests
+      - name: Apply Kubernetes manifestss
         run: |
           kubectl apply -f infra-repo/k8s/deployment.yaml --validate=false
           kubectl apply -f infra-repo/k8s/services.yaml
