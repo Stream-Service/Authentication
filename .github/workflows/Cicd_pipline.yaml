@@ -64,7 +64,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path $HOME\.kube
-          [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBECONFIGGG }}")) | Out-File -FilePath $HOME\.kube\config -Encoding utf8
+          [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBECON }}")) | Out-File -FilePath $HOME\.kube\config -Encoding utf8
 
       - name: Verify cluster connection
         shell: powershell
