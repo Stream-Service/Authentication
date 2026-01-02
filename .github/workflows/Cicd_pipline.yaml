@@ -63,8 +63,15 @@ jobs:
       - name: Configure kubeconfig 
         shell: powershell 
         run: | 
-          if (-Not (Test-Path "$HOME\.kube")) { New-Item -ItemType Directory -Force -Path "$HOME\.kube" | Out-Null } [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.to }}")) | Set-Content -Path "$HOME\.kube\config" -Encoding UTF8
-
+          # Ensure .kube directory exists 
+          if (-Not (Test-Path "$HOME\.kube")) { 
+          New-Item -ItemType Directory -Force -Path "$HOME\.kube" | Out-Null 
+          } 
+          # Write the raw kubeconfig secret into config file 
+          "${{ secrets.newsecret }}" | Set-Content -Path "$HOME\.kube\config" -Encoding UTF8 
+          # Set KUBECONFIG environment variable for later steps 
+          $env:KUBECONFIG = "$HOME\.kube\config"
+          
       - name: Verify cluster connections
         shell: powershell
         run: |
