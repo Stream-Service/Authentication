@@ -63,8 +63,8 @@ jobs:
       - name: Configure kubeconfig
         shell: powershell
         run: |
-          New-Item -ItemType Directory -Force -Path $HOME\.kube
-          [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBECON }}")) | Out-File -FilePath $HOME\.kube\config -Encoding utf8
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECON }}" > $HOME/.kube/config
 
       - name: Verify cluster connections
         shell: powershell
