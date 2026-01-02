@@ -60,11 +60,10 @@ jobs:
           version: "latest"
 
       # 8. Configure kubeconfig (single source of truth)
-      - name: Configure kubeconfig
-        shell: powershell
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.newsecret}}" > $HOME/.kube/config
+      - name: Configure kubeconfig 
+        shell: powershell 
+        run: | 
+          if (-Not (Test-Path "$HOME\.kube")) { New-Item -ItemType Directory -Force -Path "$HOME\.kube" | Out-Null } [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBECON }}")) | Set-Content -Path "$HOME\.kube\config" -Encoding UTF8
 
       - name: Verify cluster connections
         shell: powershell
