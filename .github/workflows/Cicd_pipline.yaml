@@ -72,7 +72,7 @@ jobs:
           kubectl config current-context
           kubectl get namespaces
 
-      - name: Replace image placeholderss
+      - name: Replace image placeholdersss
         shell: powershell
         run: |
           (Get-Content infra-repo\infra-repo\k8s\deployment.yaml) -replace 'IMAGE_PLACEHOLDER', 'hritik2345/auth:${{ github.sha }}' | Set-Content infra-repo\infra-repo\k8s\deployment.yaml
