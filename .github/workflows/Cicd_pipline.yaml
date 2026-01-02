@@ -64,7 +64,7 @@ jobs:
         shell: powershell
         run: |
           mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECON }}" > $HOME/.kube/config
+          echo "${{ secrets.newsecret}}" > $HOME/.kube/config
 
       - name: Verify cluster connections
         shell: powershell
