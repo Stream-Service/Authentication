@@ -16,9 +16,9 @@ Replace `<your-dockerhub-username>` and `<image-name>` with your actual values.
 
 ```bash
 # Pull the latest image
-docker pull <your-dockerhub-username>/<image-name>:latest
+docker pull hritik2345/auth:latest
 
 
 
 # Run the container in detached mode
-docker run -d -p 8000:8000 --name fastapi-ms <your-dockerhub-username>/<image-name>:latest
+docker run -d -p 8000:8000 --name fastapi-ms hritik2345/auth:latest
