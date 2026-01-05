@@ -12,8 +12,7 @@ Follow the instructions below to pull the image, run it locally, and test the en
 ---
 
 ## 📥 Pull the Docker Image
-Replace `<your-dockerhub-username>` and `<image-name>` with your actual values.
-
+ 
 ```bash
 # Pull the latest image
 docker pull hritik2345/auth:latest
