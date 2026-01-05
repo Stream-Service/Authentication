@@ -13,7 +13,7 @@ import httpx
 from core.connect import get_s3_client
 s3=get_s3_client()
 templates = Jinja2Templates(directory="templates")
-router=APIRouter(tags=["Users"],prefix="/users")
+router=APIRouter(tags=["Users"],prefix="/auth/users")
 
  
 
