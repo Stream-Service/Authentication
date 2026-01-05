@@ -5,7 +5,7 @@ import os
 import tempfile
 import requests
 
-router=APIRouter(prefix="/auth/upload",tags=["upload"])
+router=APIRouter(tags=["upload"],prefix="/auth/upload")
  
 
 @router.post("/profile/{user_id}")
