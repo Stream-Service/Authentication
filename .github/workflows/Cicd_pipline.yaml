@@ -10,9 +10,7 @@ permissions:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: powershell
+     
 
     steps:
       # 1. Checkout source code
