@@ -23,31 +23,31 @@ app=FastAPI()
 app.include_router(user_router)
 app.include_router(auth_router)
 app.include_router(upload_router)
+
+origins = [ "http://127.0.0.1:5500", "http://localhost:5500", # optional, if you sometimes use localhost 
+           ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500","http://127.0.0.1:8004", "http://localhost:8004","http://localhost:8002","http://127.0.0.1:8002","http://localhost:8003","http://127.0.0.1:8003","http://localhost:8082","http://127.0.0.1:8082",
-        "http://127.0.0.1:8009","http://localhost:5500",
-         
-    ],  # your frontend origin
+    allow_origins=origins,  # your frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
  
 
-@app.get('/')
+@app.get('/auth/check')
 def healthcheck():
     
     return JSONResponse("Hey whatupp",status_code=200)
     
  
  
-@app.get('/health')
+@app.get('/auth/health')
 def healthcheck():
     
     return JSONResponse("Health is fine",status_code=200)
 
-@app.get('/refresh')
+@app.get('/auth/refresh')
 def refresh(request:Request):
     headers = dict(request.headers)
 
