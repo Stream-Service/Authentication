@@ -2,20 +2,40 @@ from fastapi import APIRouter,Depends,Form,Request,Cookie,HTTPException
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse,HTMLResponse,Response
 from core.database import get_db,setting
-from users.models import Userinfo
-from users.schemas import RequestUser,ResponseUser,UserinfoCreate,UserinfoUpdate,DescriptionUpdate
-from users.services import insert_user,get_user,get_user_info,get_curr_user,create_userinfo,update_userinfo,get_user_data
+from users.models import Userinfo,User
+from users.schemas import RequestUser,ResponseUser,UserinfoCreate,UserinfoUpdate,DescriptionUpdate,VerifyOtpSchema,Forgot_Details
+from users.services import insert_user,get_user,get_user_info,get_curr_user,create_userinfo,update_userinfo,get_user_data,get_hash_password,get_pass_hash
 from fastapi.templating import Jinja2Templates
 import requests
+import secrets
 from botocore.exceptions import ClientError
 import httpx
+import random
+import string
+import json
+from core.config import get_settings
 
+setting=get_settings()
+from kafka import KafkaProducer
+from redis import Redis
 from core.connect import get_s3_client
 s3=get_s3_client()
 templates = Jinja2Templates(directory="templates")
 router=APIRouter(tags=["Users"],prefix="/auth/users")
 
  
+res = Redis(
+    host=setting.REDIS_SERVERS, 
+    port=setting.REDIS_PORT, 
+    decode_responses=True,
+    socket_timeout=5,          # 5 seconds max to try connecting
+    socket_connect_timeout=5,  # 5 seconds max for the initial handshake
+    retry_on_timeout=True      # Try one more time if it fails
+)
+producer = KafkaProducer(
+    bootstrap_servers=[setting.KAFKA_BOOTSTRAP_SERVERS],
+    value_serializer=lambda x: json.dumps(x).encode('utf-8')
+)
 
 @router.post("/createuser")
 async def createuser(
@@ -36,41 +56,98 @@ async def createuser(
     new_user = insert_user(data=user_data, db=db)
 
     # Prepare payload for notification
-    data = {
-        "user_name": firstname,
-        "to": email,
-        "type": "email",
-        "template_key": "welcome"
-    }
+     
+    
 
-    # 🔗 Call Neo4j API endpoint
-    async with httpx.AsyncClient() as client:
-        neo4j_res = await client.post(
-            "http://127.0.0.1:8003/create_user_no_sql",
-            json={"username": firstname, "email": email}
-        )
-
-        # 🔗 Try notification service, but ignore errors
-        try:
-            await client.post(
-                "http://127.0.0.1:8080/notification/send_notfication",
-                json=data
-            )
-        except httpx.RequestError as e:
-            # Log the error but don’t break the flow
-            print(f"Notification service unreachable: {e}")
-
-    # Handle only Neo4j response
-    if neo4j_res.status_code == 200:
-        return JSONResponse(
+    
+        
+    return JSONResponse(
             status_code=201,
-            content={"message": f"User {new_user} account created successfully in SQL + Neo4j"}
+            content={"user_name":firstname,"email":email}
         )
-    else:
-        return JSONResponse(
-            status_code=500,
-            content={"error": f"Neo4j failed with status {neo4j_res.status_code}"}
-        )
+
+
+
+# @app.post("/auth/register/send-otp")
+# def create_user(User_details: UserSignUp,db:Session = Depends(get_db)):
+#     user=db.query(User).filter(User.email==User_details.email).first()
+     
+#     if user:
+#         raise HTTPException(status_code=400, detail="User Already Exists")
+
+#     otp = str(random.randint(1000, 9999))
+    
+
+#     # Save flattened data
+#     temp_data = {
+#         "otp": otp,
+#         "firstname": User_details.firstname,
+#         "lastname": User_details.lastname,
+#         "email": User_details.email,
+#         "phone": User_details.phone,
+#         "password": User_details.password
+#     }
+    
+#     print(f"GENERATED OTP: {otp}", flush=True)
+#     # Save to Redis (expires in 300s)
+#     res.set(User_details.email, json.dumps(temp_data), ex=300)
+#     print(f"GENERA OTP: {otp}", flush=True)
+#     # --- FIX 1: Structure payload correctly for Router ---
+#     kafka_payload = {
+#         "event_type": "CHECK_OTP",
+#         "data": temp_data # Router expects 'data' key
+#     }
+#     producer.send('user_events', value=kafka_payload)
+    
+#     return {"message": "OTP Sent Successfully, Please Check Your Email"}
+
+
+
+# @app.post("/auth/register/verify-otp")
+# def register_verify_otp(payload: VerifyOtpSchema,db:Session = Depends(get_db)):
+#     stored_data_json = res.get(payload.email)
+    
+#     if not stored_data_json:
+#         raise HTTPException(status_code=400, detail="Invalid OTP or Time Expired")
+    
+#     stored_data = json.loads(stored_data_json)
+
+#     if stored_data["otp"] != payload.otp:
+#         raise HTTPException(status_code=400, detail="Invalid OTP")
+    
+#     # --- FIX 2: stored_data IS the user info, no ["user_info"] key ---
+#     new_user_info = stored_data
+    
+#     user_id = random.randint(1, 10000)
+#     new_user_info["User_id"] = user_id
+    
+#     # Remove OTP from final user record
+#     del new_user_info["otp"]
+    
+#     new_password=get_pass_hash(new_user_info["password"])
+#     new_user=User(user_id=user_id,firstname=new_user_info["firstname"],lastname=new_user_info["lastname"],
+#          email=new_user_info["email"],phone=new_user_info["phone"],password=new_password)
+    
+#     db.add(new_user)
+#     db.commit()
+#     db.refresh(new_user)
+#     res.delete(payload.email)
+
+#     # --- FIX 3: Match Topic and Event Type to Router ---
+#     event_data = {
+#         "event_type": "USER_CREATED", # Matches Router TEMPLATE_MAP
+#         "data": {
+#             "firstname": new_user_info["firstname"],
+#             "email": new_user_info["email"],
+#             "phone": new_user_info.get("phone")
+#         }
+#     }
+    
+#     # Send to 'user.events' (Router listens here), not 'platform_notifications'
+#     producer.send('user_events', value=event_data)
+#     producer.flush() 
+
+#     return {"message": "User created successfully", "user_id": user_id}
 
 @router.get("/{user_id}/description")
 def get_description(user_id: int, db: Session = Depends(get_db)):
@@ -204,3 +281,90 @@ def insert_userinfo(data: UserinfoCreate):
 #     if not updated:
 #         raise HTTPException(status_code=404, detail="Userinfo not found")
 #     return updated
+
+
+
+
+
+@router.post("/auth/forgot_password")
+def forgot_password(forgot_details:Forgot_Details,db:Session = Depends(get_db)):
+    user=db.query(User).filter(User.email==forgot_details.email).first()
+     
+    if not user:
+        raise HTTPException(status_code=400, detail="User does not Exists")
+
+    otp = str(random.randint(1000, 9999))
+    print(f"GENERATED OTP: {otp}", flush=True)
+
+    # Save flattened data
+    temp_data = {
+        "otp": otp,
+         "email": forgot_details.email,
+         "firstname":"string"
+         
+    }
+     
+     
+    res.set(forgot_details.email, json.dumps(temp_data), ex=300)
+
+     
+    kafka_payload = {
+        "event_type": "FORGOT_PASSWORD",
+        "data": temp_data # Router expects 'data' key
+    }
+    producer.send('user_events', value=kafka_payload)
+    
+    return {"message": "OTP Sent Successfully, Please Check Your Email"}
+
+
+
+@router.post("/auth/forgot/verify-otp")
+def verify_otp(payload: VerifyOtpSchema,db:Session=Depends(get_db)):
+    stored_data_json = res.get(payload.email)
+    
+    if not stored_data_json:
+        raise HTTPException(status_code=400, detail="Invalid OTP or Time Expired")
+    
+    stored_data = json.loads(stored_data_json)
+    print(stored_data)
+
+    if stored_data["otp"] != payload.otp:
+        raise HTTPException(status_code=400, detail="Invalid OTP")
+    
+    
+    
+    # Generate random password
+    alphabet = string.ascii_letters + string.digits
+    new_password = ''.join(secrets.choice(alphabet) for i in range(12))
+    print(f'New Password is: {new_password}',flush=True)
+    
+    # FIXED: Update user password in database
+    user = db.query(User).filter(User.email == payload.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.password = get_pass_hash(new_password)
+    db.commit()
+     
+     
+    
+     
+     
+    res.delete(payload.email)
+
+    # --- FIX 3: Match Topic and Event Type to Router ---
+    event_data = {
+        "event_type": "NEW_PASSWORD", # Matches Router TEMPLATE_MAP
+        "data": {
+            "firstname":  stored_data['firstname'],
+            "email":  stored_data['email'],
+            "new_password":new_password
+             
+        }
+    }
+    
+    # Send to 'user.events' (Router listens here), not 'platform_notifications'
+    producer.send('user_events', value=event_data)
+    producer.flush() 
+
+    return {"Status": "Password updated and Sent"}

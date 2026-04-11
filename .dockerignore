@@ -7,7 +7,7 @@ Authentication/
 
 # Git
 .git
-.gitignore
+ 
 .github
 
 .env
@@ -16,3 +16,6 @@ Authentication/
 # Dockerfile itself
 Dockerfile
 README.md
+
+docker-compose.yaml
+

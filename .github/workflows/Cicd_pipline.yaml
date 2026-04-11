@@ -10,7 +10,6 @@ permissions:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-     
 
     steps:
       # 1. Checkout source code
@@ -31,7 +30,10 @@ jobs:
       # 4. Build and push Docker image
       - name: Build and push Docker image
 
+<<<<<<< HEAD
+=======
          
+>>>>>>> f24f3989eedd9dd63df32086a538a22b4f7a7c51
         run: |
           docker build -t hritik2345/auth:${{ github.sha }} .
           docker push hritik2345/auth:${{ github.sha }}
@@ -58,9 +60,9 @@ jobs:
           version: "latest"
 
       # 8. Configure kubeconfig (single source of truth)
-      - name: Configure kubeconfig 
-        shell: powershell 
-        run: | 
+      - name: Configure kubeconfig
+
+        run: |
           # Ensure .kube directory exists 
           if (-Not (Test-Path "$HOME\.kube")) { 
           New-Item -ItemType Directory -Force -Path "$HOME\.kube" | Out-Null 
@@ -69,21 +71,21 @@ jobs:
           "${{ secrets.TO }}" | Set-Content -Path "$HOME\.kube\config" -Encoding UTF8 
           # Set KUBECONFIG environment variable for later steps 
           $env:KUBECONFIG = "$HOME\.kube\config"
-          
+
       - name: Verify cluster connections
-        shell: powershell
+
         run: |
           kubectl config current-context
           kubectl get namespaces
 
       - name: Replace image placeholdersss
-        shell: powershell
+
         run: |
           (Get-Content infra-repo\infra-repo\k8s\deployment.yaml) -replace 'IMAGE_PLACEHOLDER', 'hritik2345/auth:${{ github.sha }}' | Set-Content infra-repo\infra-repo\k8s\deployment.yaml
 
       # 10. Apply Kubernetes manifests
       - name: Apply Kubernetes manifests
-        shell: powershell
+
         run: |
           kubectl delete pods --all
           kubectl delete services --all

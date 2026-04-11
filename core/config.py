@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     BUCKET_ACCESS_KEY:str
     BUCKET_NAME:str
     BUCKET_ID:str
+    REDIS_SERVERS:str
+    REDIS_PORT:str
+    KAFKA_BOOTSTRAP_SERVERS:str
+
 
     
     def get_db_url(self):

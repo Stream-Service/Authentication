@@ -19,20 +19,22 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI()
  
+origins = [ "http://127.0.0.1:5500", "http://localhost:5500"] # include both forms just in case
 
-app.include_router(user_router)
-app.include_router(auth_router)
-app.include_router(upload_router)
 
-origins = [ "http://127.0.0.1:5500", "http://localhost:5500", # optional, if you sometimes use localhost 
-           ]
+ 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # your frontend origin
+    allow_origins=["*"],   # allow everything for testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(user_router)
+app.include_router(auth_router)
+app.include_router(upload_router)
  
 
 @app.get('/auth/check')

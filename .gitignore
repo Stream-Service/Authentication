@@ -1,3 +1,4 @@
 .env
 .vscode
 Authentication/
+docker-compose.yaml

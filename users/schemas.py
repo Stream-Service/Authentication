@@ -39,5 +39,11 @@ class ResponseUser(BaseModel):
     class Config:
         from_attributes = True
 
+class Forgot_Details(BaseModel):
+    
+    email: str
+    
 
-
+class VerifyOtpSchema(BaseModel):
+    email: str
+    otp: str

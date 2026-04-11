@@ -6,6 +6,7 @@ from core.database import get_db
 from auth.utils import check_token,verify_token
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
 
 oauth2scheme=OAuth2PasswordBearer(tokenUrl='auth/login')
@@ -131,3 +132,17 @@ def update_userinfo(data,db,curr_user ):
     db.commit()
     db.refresh(userinfo)
     return userinfo
+
+
+
+
+ 
+
+pwd_context=CryptContext(schemes=["argon2"],deprecated='auto')
+
+
+def get_pass_hash(plain_password):
+    return pwd_context.hash(plain_password)
+
+def verify_password(raw_pass,original_pass):
+    return pwd_context.verify(raw_pass,original_pass)
