@@ -2,3 +2,6 @@
 .vscode
 Authentication/
 docker-compose.yaml
+# Kubernetes secrets
+k8s/kafka_secret.yaml
+k8s/secrets.yaml

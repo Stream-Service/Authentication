@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp_auth_deployment
+spec:
+  selector:
+    matchLabels:
+      app: myapp_auth
+  template:
+    metadata:
+      labels:
+        app: myapp_auth
+    spec:
+      containers:
+      - name: myapp_auth_container
+        image: hritik2345/auth:latest
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8000

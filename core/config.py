@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
-
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
  
@@ -54,8 +53,11 @@ class Settings(BaseSettings):
     
     
     
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        env_file_encoding='utf-8',
+        extra="ignore" # This prevents crashes if you have extra things in your .env
+    )
 
 def get_settings() -> Settings:
     return Settings()

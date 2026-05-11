@@ -286,7 +286,7 @@ def insert_userinfo(data: UserinfoCreate):
 
 
 
-@router.post("/auth/forgot_password")
+@router.post("/forgot_password")
 def forgot_password(forgot_details:Forgot_Details,db:Session = Depends(get_db)):
     user=db.query(User).filter(User.email==forgot_details.email).first()
      
@@ -318,7 +318,7 @@ def forgot_password(forgot_details:Forgot_Details,db:Session = Depends(get_db)):
 
 
 
-@router.post("/auth/forgot/verify-otp")
+@router.post("/forgot/verify-otp")
 def verify_otp(payload: VerifyOtpSchema,db:Session=Depends(get_db)):
     stored_data_json = res.get(payload.email)
     
