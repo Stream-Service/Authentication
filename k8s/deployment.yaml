@@ -24,3 +24,6 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 8000
+        envFrom:
+            - secretRef:
+                name: mysecret
