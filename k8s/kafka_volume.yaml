@@ -1,12 +1,18 @@
+# kafka-pv.yaml
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
-  name: kafka-data
+  name: kafka-pv
   labels:
     app: kafka
 spec:
+  capacity:
+    storage: 2Gi
   accessModes:
-    - ReadWriteOnce   # One node can mount this at a time (fine for single-broker Kafka)
-  resources:
-    requests:
-      storage: 2Gi
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /mnt/kafka-data
+  claimRef:
+    namespace: default
+    name: kafka-data
