@@ -14,6 +14,13 @@ spec:
       labels:
         app: kafka
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "mkdir -p /var/lib/kafka/data && chmod -R 777 /var/lib/kafka/data"]
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /var/lib/kafka/data
       containers:
         - name: kafka
           image: confluentinc/cp-kafka:7.8.3
@@ -22,12 +29,9 @@ spec:
               containerPort: 9092
             - name: controller
               containerPort: 9093
-
-          # Load all env vars from the Secret
           envFrom:
             - secretRef:
                 name: kafka-secret
-
           resources:
             requests:
               memory: "768Mi"
@@ -35,23 +39,19 @@ spec:
             limits:
               memory: "1Gi"
               cpu: "1000m"
-
           volumeMounts:
             - name: kafka-data
               mountPath: /var/lib/kafka/data
-
           readinessProbe:
             tcpSocket:
               port: 9092
             initialDelaySeconds: 30
             periodSeconds: 10
-
           livenessProbe:
             tcpSocket:
               port: 9092
             initialDelaySeconds: 60
             periodSeconds: 20
-
       volumes:
         - name: kafka-data
           persistentVolumeClaim:
