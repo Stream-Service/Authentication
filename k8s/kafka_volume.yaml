@@ -1,4 +1,5 @@
-# kafka-pv.yaml
+# k8s/kafka_volume.yaml
+
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -16,3 +17,16 @@ spec:
   claimRef:
     namespace: default
     name: kafka-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-data
+  labels:
+    app: kafka
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
