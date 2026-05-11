@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myapp_auth_deployment
+  name: myapp-auth-deployment
 spec:
   selector:
     matchLabels:
-      app: myapp_auth
+      app: myapp-auth
   template:
     metadata:
       labels:
-        app: myapp_auth
+        app: myapp-auth
     spec:
       containers:
-      - name: myapp_auth_container
+      - name: myapp-auth-container
         image: hritik2345/auth:latest
         resources:
           requests:
