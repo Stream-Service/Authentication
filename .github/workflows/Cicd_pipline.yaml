@@ -36,8 +36,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/auth:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/auth:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/stream-service-authentication:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/stream-service-authentication:${{ github.sha }}
        
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
