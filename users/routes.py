@@ -37,6 +37,8 @@ producer = KafkaProducer(
     value_serializer=lambda x: json.dumps(x).encode('utf-8')
 )
 
+ 
+
 @router.post("/createuser")
 async def createuser(
     request: Request,
@@ -55,12 +57,16 @@ async def createuser(
     )
     new_user = insert_user(data=user_data, db=db)
 
-    # Prepare payload for notification
+    # Send event to Kafka for Neo4j user creation
+    kafka_event = {
+        "action": "create_user",
+        "username": f"{firstname} {lastname}",
+        "email": email,
+        "user_id": new_user.user_id
+    }
+    producer.send('create_db_user', value=kafka_event)
      
-    
 
-    
-        
     return JSONResponse(
             status_code=201,
             content={"user_name":firstname,"email":email}
