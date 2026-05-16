@@ -14,6 +14,11 @@ import random
 import string
 import json
 from core.config import get_settings
+import logging
+
+logger = logging.getLogger("uvicorn.error") # Joins the Uvicorn log stream
+
+
 
 setting=get_settings()
 from kafka import KafkaProducer
@@ -65,6 +70,8 @@ async def createuser(
         "user_id": new_user.id
     }
     producer.send('create_db_user', value=kafka_event)
+    # Inside your router...
+    logger.info(f"[KAFKA] Event sent to create_db_user: {kafka_event}")
     producer.flush()
 
     return JSONResponse(
