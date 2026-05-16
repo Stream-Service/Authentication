@@ -65,7 +65,7 @@ async def createuser(
         "user_id": new_user.id
     }
     producer.send('create_db_user', value=kafka_event)
-     
+    producer.flush()
 
     return JSONResponse(
             status_code=201,
