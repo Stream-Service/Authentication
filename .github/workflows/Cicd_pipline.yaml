@@ -45,7 +45,7 @@ jobs:
       - name: Configure kubeconfig
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG10 }}" | base64 -d > ~/.kube/config
+          echo "${{ secrets.KUBE_CONFIG100 }}" | base64 -d > ~/.kube/config
 
 
       
