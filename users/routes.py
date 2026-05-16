@@ -62,7 +62,7 @@ async def createuser(
         "action": "create_user",
         "username": f"{firstname} {lastname}",
         "email": email,
-        "user_id": new_user.user_id
+        "user_id": new_user.id
     }
     producer.send('create_db_user', value=kafka_event)
      
