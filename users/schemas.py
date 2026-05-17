@@ -47,3 +47,10 @@ class Forgot_Details(BaseModel):
 class VerifyOtpSchema(BaseModel):
     email: str
     otp: str
+
+class UserSignUp(BaseModel):
+    firstname: str
+    lastname: str
+    email: EmailStr
+    phone: Optional[str] = None
+    password: str
