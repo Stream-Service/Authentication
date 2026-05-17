@@ -52,7 +52,7 @@ def get_user_info(user_id,db):
     user=db.query(User).filter(User.id==user_id).first()
      
     if not user:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="USERNAME OR PASSWOED IS WRONG")
+        raise HTTPException(status_code=status.HTTP_200_OK,detail="USERNAME OR PASSWOED IS WRONG")
      
     return user
 

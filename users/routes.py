@@ -226,7 +226,7 @@ def profile(request: Request, curr_user: int = Depends(get_curr_user), db: Sessi
 # Change from a query string to an explicit path parameter
 @router.get("/get_data/{data}")
 def avatar(request: Request, data: int, db: Session = Depends(get_db)):
-    user = get_user_data(data, db)
+    user = get_user_info(data, db)
     return user
 
 @router.get("/profile2")
