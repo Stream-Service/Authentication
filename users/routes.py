@@ -236,7 +236,7 @@ def avatar(request:Request,data:int,db: Session = Depends(get_db)):
     return user
 
 @router.post("/get_data")
-def avatar(request:Request,data:int,db: Session = Depends(get_db)):
+def avatar1(request:Request,data:int,db: Session = Depends(get_db)):
     return {"hello"}
 
 @router.get("/profile2")
