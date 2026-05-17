@@ -228,7 +228,7 @@ def profile(request: Request, curr_user: int = Depends(get_curr_user), db: Sessi
      
 #     return user
 
-@router.get("/get_data")
+@router.get("/../users/get_data")
 def avatar(request:Request,data:int,db: Session = Depends(get_db)):
     user = get_user_data(data, db)
      
