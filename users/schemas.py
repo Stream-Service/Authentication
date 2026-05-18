@@ -54,3 +54,14 @@ class UserSignUp(BaseModel):
     email: EmailStr
     phone: Optional[str] = None
     password: str
+
+
+
+
+class DescriptionUpdate(BaseModel):
+    description: str
+
+class UserinfoUpdate(BaseModel):
+    about:    Optional[str] = None
+    location: Optional[str] = None
+    phone_no: Optional[str] = None

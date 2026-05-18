@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse,HTMLResponse,Response
 from core.database import get_db,setting
 from users.models import Userinfo,User
-from users.schemas import RequestUser,ResponseUser,UserinfoCreate,UserinfoUpdate,DescriptionUpdate,VerifyOtpSchema,Forgot_Details,UserSignUp
+from users.schemas import RequestUser,ResponseUser,UserinfoCreate,UserinfoUpdate,DescriptionUpdate,VerifyOtpSchema,Forgot_Details,UserSignUp,DescriptionUpdate
 from users.services import insert_user,get_user,get_user_info,get_curr_user,create_userinfo,update_userinfo,get_user_data,get_hash_password,get_pass_hash
 from fastapi.templating import Jinja2Templates
 import requests
@@ -182,28 +182,47 @@ def register_verify_otp(payload: VerifyOtpSchema, db: Session = Depends(get_db))
         content={"user_name": new_user_info["firstname"], "email": new_user_info["email"]}
     )
 
+ 
+# GET description
 @router.get("/{user_id}/description")
-def get_description(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(Userinfo).filter(Userinfo.user_id == user_id).first()
-    
-    # If the user record is not found in the database, return an empty string right away
-    if not user:
-        return {"description": ""}
-        
-    # If the user exists, return their "about" field or an empty string fallback if "about" is null
-    return {"description": user.about or ""}
+def get_description(user_id: int, curr_user: int = Depends(get_curr_user), db: Session = Depends(get_db)):
+    userinfo = db.query(Userinfo).filter(Userinfo.user_id == user_id).first()
+    return {"description": userinfo.about if userinfo else ""}
 
-# 🔹 2. Edit description
+
+# PUT description — create Userinfo row if it doesn't exist
 @router.put("/{user_id}/description")
-def update_description(user_id: int, update: DescriptionUpdate, db: Session = Depends(get_db)):
-    user = db.query(Userinfo).filter(Userinfo.user_id == user_id).first()
-    if not user:
+def update_description(user_id: int, update: DescriptionUpdate, curr_user: int = Depends(get_curr_user),db: Session = Depends(get_db)):
+    user_exists = db.query(User).filter(User.id == user_id).first()
+    if not user_exists:
         raise HTTPException(status_code=404, detail="User not found")
 
-    user.about= update.description
+    userinfo = db.query(Userinfo).filter(Userinfo.user_id == user_id).first()
+    if not userinfo:
+        userinfo = Userinfo(user_id=user_id, about=update.description)
+        db.add(userinfo)
+    else:
+        userinfo.about = update.description
+
     db.commit()
-    db.refresh(user)
-    return {"message": "Description updated successfully", "description": user.about}
+    db.refresh(userinfo)
+    return {"message": "Description updated successfully", "description": userinfo.about}
+
+
+# GET user data (used in comments)
+@router.get("/get_data/{user_id}")
+def get_user_data(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {
+        "id":        user.id,
+        "firstname": user.firstname,
+        "lastname":  user.lastname,
+        "email":     user.email,
+        "created_at": str(user.created_at)
+    }
+
 
 @router.get("/profile", response_class=HTMLResponse)
 def profile(request: Request, curr_user: int = Depends(get_curr_user), db: Session = Depends(get_db)):
@@ -229,7 +248,7 @@ def profile(request: Request, curr_user: int = Depends(get_curr_user), db: Sessi
 
 # Change from a query string to an explicit path parameter
 @router.get("/get_data/{data}", response_model=ResponseUser)
-def avatar(request: Request, data: int, db: Session = Depends(get_db)):
+def avatar(request: Request, data: int, db: Session = Depends(get_db),curr_user:int= Depends(get_curr_user)):
     user = get_user_info(data, db)
     return user
 
@@ -296,11 +315,11 @@ def get_profile_pic(user_id: int):
                     media_type="image/jpeg",
                     headers={"Cache-Control": "public, max-age=86400"})
  
-@router.post("/userinfo")
-def insert_userinfo(data: UserinfoCreate):
-    print(data)
-    # user_inffo=create_userinfo(data,db)
-    return {"user_data":"user_inffo"}
+# @router.post("/userinfo")
+# def insert_userinfo(data: UserinfoCreate,db: Session = Depends(get_db)):
+     
+#     user_inffo=create_userinfo(data,db)
+#     return {"user_data":"user_inffo"}
 
 # @router.put("/userinfo")
 # def modify_userinfo(data: UserinfoUpdate, db: Session = Depends(get_db)):
