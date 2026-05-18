@@ -185,8 +185,12 @@ def register_verify_otp(payload: VerifyOtpSchema, db: Session = Depends(get_db))
 @router.get("/{user_id}/description")
 def get_description(user_id: int, db: Session = Depends(get_db)):
     user = db.query(Userinfo).filter(Userinfo.user_id == user_id).first()
+    
+    # If the user record is not found in the database, return an empty string right away
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        return {"description": ""}
+        
+    # If the user exists, return their "about" field or an empty string fallback if "about" is null
     return {"description": user.about or ""}
 
 # 🔹 2. Edit description
