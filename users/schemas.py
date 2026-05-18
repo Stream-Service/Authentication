@@ -33,7 +33,7 @@ class UserinfoUpdate(BaseModel):
 class ResponseUser(BaseModel):
     firstname: str
     lastname: str
-    email: EmailStr
+    
     # role: str
 
     class Config:
