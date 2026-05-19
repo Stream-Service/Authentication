@@ -1,5 +1,5 @@
 from fastapi import HTTPException,status,Request,Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse,Response
 from users.models import User,Userinfo
 from core.security import get_hash_password
 from core.database import get_db
@@ -146,3 +146,13 @@ def get_pass_hash(plain_password):
 
 def verify_password(raw_pass,original_pass):
     return pwd_context.verify(raw_pass,original_pass)
+
+
+
+def get_default_placeholder():
+    with open("static/volume.png", "rb") as f:
+        return Response(
+            content=f.read(),
+            media_type="image/png",
+            headers={"Cache-Control": "public, max-age=3600"}
+        )

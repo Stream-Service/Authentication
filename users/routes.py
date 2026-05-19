@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse,HTMLResponse,Response
 from core.database import get_db,setting
 from users.models import Userinfo,User
 from users.schemas import RequestUser,ResponseUser,UserinfoCreate,UserinfoUpdate,DescriptionUpdate,VerifyOtpSchema,Forgot_Details,UserSignUp,DescriptionUpdate
-from users.services import insert_user,get_user,get_user_info,get_curr_user,create_userinfo,update_userinfo,get_user_data,get_hash_password,get_pass_hash
+from users.services import insert_user,get_user,get_user_info,get_curr_user,create_userinfo,update_userinfo,get_user_data,get_hash_password,get_pass_hash,get_default_placeholder
 from fastapi.templating import Jinja2Templates
 import requests
 import secrets
@@ -211,7 +211,7 @@ def update_description(user_id: int, update: DescriptionUpdate, curr_user: int =
 
 # GET user data (used in comments)
 @router.get("/get_data/{user_id}")
-def get_user_data(user_id: int, db: Session = Depends(get_db)):
+def get_user_data(user_id: int, db: Session = Depends(get_db), curr_user: int = Depends(get_curr_user)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -297,23 +297,23 @@ def profile(request: Request, curr_user: int = Depends(get_curr_user), db: Sessi
 #     })
  
 @router.get("/{user_id}/profile-pic")
-def get_profile_pic(user_id: int):
+def get_profile_pic(user_id: int, curr_user: int = Depends(get_curr_user)):
     key = f"users/{user_id}/{user_id}.jpg"
-    try:
-        obj = s3.get_object(Bucket=setting.get_bucket_name(), Key=key)
-        return Response(
-            content=obj["Body"].read(),
-            media_type="image/jpeg",
-            headers={"Cache-Control": "public, max-age=86400"}  # cache for 1 day
-        )
-    except ClientError as e:
-        if e.response['Error']['Code'] == "NoSuchKey":
-            # ✅ Continue gracefully: return a default placeholder image
-            with open("static/volume.png", "rb") as f:
-                return Response(
-                    content=f.read(),
-                    media_type="image/jpeg",
-                    headers={"Cache-Control": "public, max-age=86400"})
+    
+    # Check if the object exists in the bucket
+    response = s3.list_objects_v2(Bucket=setting.get_bucket_name(), Prefix=key)
+    
+    # Key count will be 0 if the file doesn't exist
+    if response.get('KeyCount', 0) == 0:
+        return get_default_placeholder()
+        
+    # File exists, proceed to download safely
+    obj = s3.get_object(Bucket=setting.get_bucket_name(), Key=key)
+    return Response(
+        content=obj["Body"].read(),
+        media_type="image/jpeg",
+        headers={"Cache-Control": "public, max-age=86400"}
+    )
  
 # @router.post("/userinfo")
 # def insert_userinfo(data: UserinfoCreate,db: Session = Depends(get_db)):
