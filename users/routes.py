@@ -219,8 +219,8 @@ def get_user_data(user_id: int, db: Session = Depends(get_db), curr_user: int = 
         "id":        user.id,
         "firstname": user.firstname,
         "lastname":  user.lastname,
-        "email":     user.email,
-        "created_at": str(user.created_at)
+         
+         
     }
 
 
